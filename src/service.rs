@@ -1,6 +1,6 @@
 use rayon::prelude::*;
 use tonic::{Request, Response, Status};
-use simulation::{SimulationBatchRequest, PopulationPartialResult, SimulationScenario};
+use simulation::{SimulationBatchRequest, PopulationPartialResult, SimulationScenario, Portfolio};
 use crate::compute_portfolio_performance; // your existing fn
 use crate::Sampler;                        // your sampler type
 
@@ -15,9 +15,14 @@ impl simulation::simulation_service_server::SimulationService for SimulationServ
         &self,
         request: Request<SimulationBatchRequest>,
     ) -> Result<Response<PopulationPartialResult>, Status> {
+        // Extract the batch request
         let req = request.into_inner();
-        let portfolios = req.portfolios;
-        let config = req.config;
+        
+        // Deserialize the portfolios blob using bincode.
+        // The blob is assumed to be a bincode serialized Vec<Portfolio>.
+        let portfolios: Vec<Portfolio> = bincode::deserialize(&req.portfolios_blob)
+            .map_err(|e| Status::invalid_argument(format!("Failed to deserialize portfolios: {}", e)))?;
+        let config = req.config; // Using config if needed; otherwise, you can ignore it.
         let iterations = req.iterations as usize;
 
         // Prepare accumulators
@@ -27,11 +32,14 @@ impl simulation::simulation_service_server::SimulationService for SimulationServ
         let mut sum_sharpes = vec![0.0; n];
         let mut last_scenario = Vec::new();
 
-        // Run the batch *synchronously*, but wrap in spawn_blocking
+        // Clone the sampler to use within the blocking task.
+        let sampler = self.sampler.clone();
+
+        // Run the batch *synchronously*, but wrap in spawn_blocking to avoid blocking the async executor.
         let (sr, sv, ss, ls) = tokio::task::spawn_blocking(move || {
             for i in 0..iterations {
                 // sample scenario
-                let scenario_returns = self.sampler.sample_returns();
+                let scenario_returns = sampler.sample_returns();
                 if i == iterations - 1 {
                     last_scenario = scenario_returns.clone();
                 }
