@@ -1,6 +1,7 @@
 use rayon::prelude::*;
 use tonic::{Request, Response, Status};
-use simulation::{SimulationBatchRequest, PopulationPartialResult, SimulationScenario, Portfolio};
+use aegis_athena_contracts::simulation::simulation_service_server::{SimulationService, SimulationServiceServer};
+use aegis_athena_contracts::simulation::{SimulationBatchRequest, SimulationBatchResult, SimulationScenario, EvolutionConfig, Portfolio};
 use crate::compute_portfolio_performance; // your existing fn
 use crate::Sampler;                        // your sampler type
 
@@ -14,7 +15,7 @@ impl simulation::simulation_service_server::SimulationService for SimulationServ
     async fn run_batch(
         &self,
         request: Request<SimulationBatchRequest>,
-    ) -> Result<Response<PopulationPartialResult>, Status> {
+    ) -> Result<Response<SimulationBatchResult>, Status> {
         // Extract the batch request
         let req = request.into_inner();
         
