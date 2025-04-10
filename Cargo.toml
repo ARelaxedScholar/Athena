@@ -5,4 +5,3 @@ edition = "2024"
 
 [dependencies]
 aegis_athena_contracts = { git = "https://github.com/ARelaxedScholar/Aegis-Athena-Contracts" }
-aegis = { git = "https://github.com/ARelaxedScholar/Aegis"}
