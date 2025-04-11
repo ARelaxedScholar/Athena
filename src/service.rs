@@ -2,8 +2,8 @@ use rayon::prelude::*;
 use tonic::{Request, Response, Status};
 use aegis_athena_contracts::simulation::simulation_service_server::{SimulationService, SimulationServiceServer};
 use aegis_athena_contracts::simulation::{SimulationBatchRequest, SimulationBatchResult, SimulationScenario, EvolutionConfig, Portfolio};
-use crate::compute_portfolio_performance; // your existing fn
-use crate::Sampler;                        // your sampler type
+use aegis_athena_contracts::common_portfolio_evolution_ds::compute_portfolio_performance; 
+use aegis_athena_contracts::sampling::Sampler;                        
 
 #[derive(Clone)]
 pub struct SimulationServiceImpl {
