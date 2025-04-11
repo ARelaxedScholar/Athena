@@ -1,12 +1,11 @@
-use my_crate::Sampler;
-use my_crate::SimulationServiceImpl; // Adjust to your crate's module structure.
+use crate::Sampler;
+use crate::service::SimulationServiceImpl; 
 use rand::Rng;
 use rand::SeedableRng;
-use rand_distr::Normal;
-use aegis_athena_contracts::simulation_service_server::{SimulationService, SimulationServiceServer};
-use aegis_athena_contracts::{Portfolio, SimulationBatchRequest, SimulationBatchResult, SimulationScenario};
+use aegis_athena_contracts::simulation::simulation_service_server::{SimulationService, SimulationServiceServer};
+use aegis_athena_contracts::simulation::{Portfolio, SimulationBatchRequest, SimulationBatchResult, SimulationScenario};
 use tonic::transport::Server;
-use tonic::{Request, Response, Status}; // Import your sampler type.
+use tonic::{Request, Response, Status}; 
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
